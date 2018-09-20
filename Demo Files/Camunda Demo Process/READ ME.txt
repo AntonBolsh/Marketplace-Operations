@@ -1,0 +1,9 @@
+READ ME
+
+This requires Node.js
+
+To start a new instance use start-process.js.
+
+To execute service tasks start worker.js
+
+To send Messages use API (e.g. Postman) and messages name

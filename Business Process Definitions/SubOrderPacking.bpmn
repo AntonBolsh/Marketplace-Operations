@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0h2561r" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.0">
+  <bpmn:process id="SubOrderPacking" name="SubOrderPacking" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1nk2b3d">
+      <bpmn:outgoing>SequenceFlow_083nsc0</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:intermediateCatchEvent id="IntermediateCatchEvent_1tycuyn" name="Старт комплектации отправления мерчантом">
+      <bpmn:incoming>SequenceFlow_083nsc0</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1efg83u</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0yyrss3" messageRef="Message_1kqjuep" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="ServiceTask_06nq4c8" name="Зафиксировать старт комплектации" camunda:type="external" camunda:topic="Start">
+      <bpmn:incoming>SequenceFlow_1efg83u</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0dqehas</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="IntermediateCatchEvent_1p6rjxb" name="Завершена комплектация отправления мерчантом">
+      <bpmn:incoming>SequenceFlow_0dqehas</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_11rhwlg</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_19m3vhq" messageRef="Message_1p167s6" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="ServiceTask_15np506" name="Зафиксировать завершение комплектации" camunda:type="external" camunda:topic="Start">
+      <bpmn:incoming>SequenceFlow_11rhwlg</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1m6az72</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_002b5o1" name="Отправление скомплектовано">
+      <bpmn:incoming>SequenceFlow_1m6az72</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:subProcess id="SubProcess_1ela2zv" triggeredByEvent="true">
+      <bpmn:intermediateCatchEvent id="IntermediateCatchEvent_1tfsj88" name="Получен Отказ Мерчанта">
+        <bpmn:outgoing>SequenceFlow_0l07huj</bpmn:outgoing>
+        <bpmn:messageEventDefinition id="MessageEventDefinition_0yyc7fg" messageRef="Message_03ywcye" />
+      </bpmn:intermediateCatchEvent>
+      <bpmn:endEvent id="EndEvent_064m6xl" name="Отказ Мерчанта">
+        <bpmn:incoming>SequenceFlow_0cnsoig</bpmn:incoming>
+        <bpmn:escalationEventDefinition id="EscalationEventDefinition_0n5tc59" escalationRef="Escalation_1ls5ert" />
+      </bpmn:endEvent>
+      <bpmn:serviceTask id="ServiceTask_1m6o4j5" name="Зафиксировать отказ" camunda:type="external" camunda:topic="Start">
+        <bpmn:incoming>SequenceFlow_0l07huj</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_0cnsoig</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="SequenceFlow_0l07huj" sourceRef="IntermediateCatchEvent_1tfsj88" targetRef="ServiceTask_1m6o4j5" />
+      <bpmn:sequenceFlow id="SequenceFlow_0cnsoig" sourceRef="ServiceTask_1m6o4j5" targetRef="EndEvent_064m6xl" />
+      <bpmn:textAnnotation id="TextAnnotation_0t7gkok">
+        <bpmn:text>!ToDo</bpmn:text>
+      </bpmn:textAnnotation>
+      <bpmn:association id="Association_0va2wj7" sourceRef="ServiceTask_1m6o4j5" targetRef="TextAnnotation_0t7gkok" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="SequenceFlow_083nsc0" sourceRef="StartEvent_1nk2b3d" targetRef="IntermediateCatchEvent_1tycuyn" />
+    <bpmn:sequenceFlow id="SequenceFlow_1efg83u" sourceRef="IntermediateCatchEvent_1tycuyn" targetRef="ServiceTask_06nq4c8" />
+    <bpmn:sequenceFlow id="SequenceFlow_0dqehas" sourceRef="ServiceTask_06nq4c8" targetRef="IntermediateCatchEvent_1p6rjxb" />
+    <bpmn:sequenceFlow id="SequenceFlow_11rhwlg" sourceRef="IntermediateCatchEvent_1p6rjxb" targetRef="ServiceTask_15np506" />
+    <bpmn:sequenceFlow id="SequenceFlow_1m6az72" sourceRef="ServiceTask_15np506" targetRef="EndEvent_002b5o1" />
+    <bpmn:textAnnotation id="TextAnnotation_0fe0o5b">
+      <bpmn:text>Отказ на любом этапе процесса</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_149987y" sourceRef="SubProcess_1ela2zv" targetRef="TextAnnotation_0fe0o5b" />
+    <bpmn:textAnnotation id="TextAnnotation_1mok1zz">
+      <bpmn:text>!ToDo</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1j5i0xr" sourceRef="ServiceTask_06nq4c8" targetRef="TextAnnotation_1mok1zz" />
+    <bpmn:textAnnotation id="TextAnnotation_0josmts">
+      <bpmn:text>!ToDo</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0cw7kpu" sourceRef="ServiceTask_15np506" targetRef="TextAnnotation_0josmts" />
+  </bpmn:process>
+  <bpmn:message id="Message_03ywcye" name="PackingRefused" />
+  <bpmn:escalation id="Escalation_1ls5ert" name="PackingRefused_Escalation" escalationCode="PackingRefused_Escalation" />
+  <bpmn:message id="Message_1kqjuep" name="PackingStarted" />
+  <bpmn:message id="Message_1p167s6" name="PackingCompleted" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="SubOrderPacking">
+      <bpmndi:BPMNShape id="StartEvent_1nk2b3d_di" bpmnElement="StartEvent_1nk2b3d">
+        <dc:Bounds x="153" y="294" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_1tycuyn_di" bpmnElement="IntermediateCatchEvent_1tycuyn">
+        <dc:Bounds x="254" y="294" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="237" y="337" width="72" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_06nq4c8_di" bpmnElement="ServiceTask_06nq4c8">
+        <dc:Bounds x="347" y="272" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_1p6rjxb_di" bpmnElement="IntermediateCatchEvent_1p6rjxb">
+        <dc:Bounds x="508" y="294" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="490" y="337" width="72" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_15np506_di" bpmnElement="ServiceTask_15np506">
+        <dc:Bounds x="610" y="272" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_002b5o1_di" bpmnElement="EndEvent_002b5o1">
+        <dc:Bounds x="776" y="294" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="753" y="337" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_1ela2zv_di" bpmnElement="SubProcess_1ela2zv" isExpanded="true">
+        <dc:Bounds x="265" y="420" width="407" height="186" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_083nsc0_di" bpmnElement="SequenceFlow_083nsc0">
+        <di:waypoint x="189" y="312" />
+        <di:waypoint x="254" y="312" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1efg83u_di" bpmnElement="SequenceFlow_1efg83u">
+        <di:waypoint x="290" y="312" />
+        <di:waypoint x="347" y="312" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0dqehas_di" bpmnElement="SequenceFlow_0dqehas">
+        <di:waypoint x="447" y="312" />
+        <di:waypoint x="508" y="312" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_11rhwlg_di" bpmnElement="SequenceFlow_11rhwlg">
+        <di:waypoint x="544" y="312" />
+        <di:waypoint x="610" y="312" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1m6az72_di" bpmnElement="SequenceFlow_1m6az72">
+        <di:waypoint x="710" y="312" />
+        <di:waypoint x="776" y="312" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_1tfsj88_di" bpmnElement="IntermediateCatchEvent_1tfsj88">
+        <dc:Bounds x="304" y="501" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="284" y="544" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_064m6xl_di" bpmnElement="EndEvent_064m6xl">
+        <dc:Bounds x="584" y="501" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="561" y="544" width="83" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1m6o4j5_di" bpmnElement="ServiceTask_1m6o4j5">
+        <dc:Bounds x="411" y="479" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0l07huj_di" bpmnElement="SequenceFlow_0l07huj">
+        <di:waypoint x="340" y="519" />
+        <di:waypoint x="411" y="519" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0cnsoig_di" bpmnElement="SequenceFlow_0cnsoig">
+        <di:waypoint x="511" y="519" />
+        <di:waypoint x="584" y="519" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_0fe0o5b_di" bpmnElement="TextAnnotation_0fe0o5b">
+        <dc:Bounds x="799" y="466" width="100" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_149987y_di" bpmnElement="Association_149987y">
+        <di:waypoint x="672" y="501" />
+        <di:waypoint x="799" y="493" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_1mok1zz_di" bpmnElement="TextAnnotation_1mok1zz">
+        <dc:Bounds x="447" y="192" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1j5i0xr_di" bpmnElement="Association_1j5i0xr">
+        <di:waypoint x="435" y="272" />
+        <di:waypoint x="483" y="222" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_0josmts_di" bpmnElement="TextAnnotation_0josmts">
+        <dc:Bounds x="710" y="192" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0cw7kpu_di" bpmnElement="Association_0cw7kpu">
+        <di:waypoint x="698" y="272" />
+        <di:waypoint x="746" y="222" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_0t7gkok_di" bpmnElement="TextAnnotation_0t7gkok">
+        <dc:Bounds x="552" y="440" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0va2wj7_di" bpmnElement="Association_0va2wj7">
+        <di:waypoint x="511" y="496" />
+        <di:waypoint x="569" y="470" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
